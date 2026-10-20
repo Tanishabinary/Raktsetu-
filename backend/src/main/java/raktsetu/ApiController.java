@@ -1,5 +1,5 @@
 package raktsetu;
-
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
@@ -94,5 +94,12 @@ public class ApiController {
     @GetMapping("/requests")
     public List<BloodRequest> getAllRequests() {
         return raktsetu.requests;
+    }
+}
+@Controller
+class WebController {
+    @GetMapping("/")
+    public String index() {
+        return "index.html";
     }
 }
