@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Status | RaktSetu</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .status-card {
+            background: #FFF4E3;
+            padding: 20px;
+            margin-top: 25px;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .status-card h3 {
+            color: #6D1428;
+            text-align: center;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .details-table th,
+        .details-table td {
+            padding: 12px;
+            border: 1px solid #eadbd7;
+            text-align: left;
+            overflow-wrap: anywhere;
+        }
+
+        .details-table th {
+            width: 45%;
+            background: #6D1428;
+            color: white;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            background: #fff0c2;
+            color: #805900;
+            font-weight: bold;
+        }
+
+        .status-message {
+            margin-top: 18px;
+            text-align: center;
+        }
+
+        .status-note {
+            margin-top: 20px;
+            font-size: 14px;
+            background: #FFF4E3;
+            padding: 12px;
+            border-radius: 8px;
+        }
+    
+        /* RaktaSetu Logo */
+        .brand-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .brand-logo img {
+            width: 180px;
+            max-width: 80%;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="brand">
+        <div class="brand-logo">
+            <img src="raktsetu-logo.jpeg"
+                 alt="RaktSetu - The Bridge Between Donors and Lives">
+        </div>
+        <h3>A Bridge Between Donors and Lives</h3>
+    </header>
+
+
+    <main class="form-card">
+
+        <h2>Check Request Status</h2>
+
+        <p class="description">
+            Enter your request ID to check the current status
+            of your blood request.
+        </p>
+
+        <form id="statusForm">
+
+            <label for="requestId">Request ID *</label>
+            <input
+                type="text"
+                id="requestId"
+                name="requestId"
+                placeholder="Example: REQ1001"
+                required
+            >
+
+            <button type="submit" class="btn btn-primary">
+                Check Status
+            </button>
+
+            <button type="reset" class="btn">
+                Clear
+            </button>
+
+        </form>
+
+        <p id="statusMessage" class="status-message" role="status"></p>
+
+        <section id="requestDetails" class="status-card" hidden>
+
+            <h3>Request Details</h3>
+
+            <table class="details-table">
+                <tbody>
+                    <tr>
+                        <th>Request ID</th>
+                        <td id="detailId"></td>
+                    </tr>
+                    <tr>
+                        <th>Patient Name</th>
+                        <td id="detailPatient"></td>
+                    </tr>
+                    <tr>
+                        <th>Blood Group</th>
+                        <td id="detailGroup"></td>
+                    </tr>
+                    <tr>
+                        <th>Units Requested</th>
+                        <td id="detailUnits"></td>
+                    </tr>
+                    <tr>
+                        <th>Hospital</th>
+                        <td id="detailHospital"></td>
+                    </tr>
+                    <tr>
+                        <th>Urgency</th>
+                        <td id="detailUrgency"></td>
+                    </tr>
+                    <tr>
+                        <th>Request Status</th>
+                        <td>
+                            <span id="detailStatus" class="status-badge"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </section>
+
+        <p class="status-note">
+            <strong>Note:</strong> This page currently uses illustrative
+            sample data. Actual request details and status updates require
+            backend database integration.
+        </p>
+
+        <p class="back-link">
+            <a href="dashboard.html">← Back to Dashboard</a>
+        </p>
+
+    </main>
+
+    <footer>
+        <p>© 2026 RaktaSetu | A Bridge Between Donors and Lives</p>
+    </footer>
+
+    <script>
+        // Sample records for frontend demonstration only
+        const requests = {
+            "REQ1001": {
+                patient: "Sample Patient",
+                bloodGroup: "O+",
+                units: 2,
+                hospital: "Sample Hospital, Thane",
+                urgency: "Emergency",
+                status: "Pending"
+            },
+            "REQ1002": {
+                patient: "Demo Patient",
+                bloodGroup: "A+",
+                units: 1,
+                hospital: "Demo Hospital, Mumbai",
+                urgency: "Normal",
+                status: "Approved"
+            },
+            "REQ1003": {
+                patient: "Test Patient",
+                bloodGroup: "B+",
+                units: 3,
+                hospital: "Test Hospital, Navi Mumbai",
+                urgency: "Urgent",
+                status: "Fulfilled"
+            },
+            "REQ1004": {
+                patient: "Example Patient",
+                bloodGroup: "AB+",
+                units: 1,
+                hospital: "Example Hospital, Thane",
+                urgency: "Normal",
+                status: "Rejected"
+            }
+        };
+
+        const statusForm = document.getElementById("statusForm");
+        const requestIdInput = document.getElementById("requestId");
+        const statusMessage = document.getElementById("statusMessage");
+        const requestDetails = document.getElementById("requestDetails");
+
+        statusForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const requestId = requestIdInput.value.trim().toUpperCase();
+            const request = requests[requestId];
+
+            requestDetails.hidden = true;
+
+            if (!request) {
+                statusMessage.textContent =
+                    "No sample request found with this ID. Please check the ID or use REQ1001, REQ1002, REQ1003, or REQ1004 to test the page.";
+                statusMessage.style.color = "#C62828";
+                return;
+            }
+
+            document.getElementById("detailId").textContent = requestId;
+            document.getElementById("detailPatient").textContent = request.patient;
+            document.getElementById("detailGroup").textContent = request.bloodGroup;
+            document.getElementById("detailUnits").textContent = request.units;
+            document.getElementById("detailHospital").textContent = request.hospital;
+            document.getElementById("detailUrgency").textContent = request.urgency;
+            document.getElementById("detailStatus").textContent = request.status;
+
+            statusMessage.textContent =
+                "Sample request record found.";
+            statusMessage.style.color = "#276738";
+
+            requestDetails.hidden = false;
+        });
+
+        statusForm.addEventListener("reset", function() {
+            statusMessage.textContent = "";
+            requestDetails.hidden = true;
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,290 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Request | RaktSetu</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .request-note {
+            background: #FFF4E3;
+            padding: 14px;
+            border-radius: 8px;
+            margin: 18px 0;
+            font-size: 14px;
+        }
+
+        .request-message {
+            margin-top: 18px;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-wrap: anywhere;
+        }
+
+        .request-id {
+            color: #6D1428;
+            font-weight: bold;
+        }
+    
+        /* RaktaSetu Logo */
+        .brand-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .brand-logo img {
+            width: 180px;
+            max-width: 80%;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="brand">
+        <div class="brand-logo">
+            <img src="raktsetu-logo.jpeg"
+                 alt="RaktSetu - The Bridge Between Donors and Lives">
+        </div>
+        <h3>A Bridge Between Donors and Lives</h3>
+    </header>
+
+
+    <main class="form-card">
+
+        <h2>Submit Blood Request</h2>
+
+        <p class="description">
+            Enter the patient's details to request blood.
+        </p>
+
+        <form id="requestForm">
+
+            <label for="patientName">Patient Name *</label>
+            <input
+                type="text"
+                id="patientName"
+                name="patientName"
+                placeholder="Enter patient name"
+                required
+            >
+
+            <label for="bloodGroup">Blood Group Required *</label>
+            <select id="bloodGroup" name="bloodGroup" required>
+                <option value="">Select blood group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+            </select>
+
+            <label for="units">Units Required *</label>
+            <input
+                type="number"
+                id="units"
+                name="units"
+                min="1"
+                step="1"
+                placeholder="Enter number of units"
+                required
+            >
+
+            <label for="hospitalName">Hospital Name *</label>
+            <input
+                type="text"
+                id="hospitalName"
+                name="hospitalName"
+                placeholder="Enter hospital name"
+                required
+            >
+
+            <label for="hospitalLocation">Hospital Location *</label>
+            <input
+                type="text"
+                id="hospitalLocation"
+                name="hospitalLocation"
+                placeholder="Enter hospital city or area"
+                required
+            >
+
+            <label for="contact">Contact Number *</label>
+            <input
+                type="tel"
+                id="contact"
+                name="contact"
+                placeholder="Enter 10-digit contact number"
+                pattern="[0-9]{10}"
+                maxlength="10"
+                title="Enter a valid 10-digit phone number"
+                required
+            >
+
+            <label for="requiredDate">Required Date *</label>
+            <input
+                type="date"
+                id="requiredDate"
+                name="requiredDate"
+                required
+            >
+
+            <label for="urgency">Urgency Level *</label>
+            <select id="urgency" name="urgency" required>
+                <option value="">Select urgency</option>
+                <option value="Normal">Normal</option>
+                <option value="Urgent">Urgent</option>
+                <option value="Emergency">Emergency</option>
+            </select>
+
+            <label for="reason">Reason for Request (Optional)</label>
+            <textarea
+                id="reason"
+                name="reason"
+                rows="3"
+                placeholder="Enter additional details if necessary"
+            ></textarea>
+
+            <p class="request-note">
+                <strong>Important:</strong> Submitting a request does not
+                guarantee blood availability or approval. Emergency cases
+                should contact the hospital and an authorized blood bank
+                directly without waiting for this form.
+            </p>
+
+            <button type="submit" class="btn btn-primary">
+                Submit Request
+            </button>
+
+            <button type="reset" class="btn">
+                Clear Form
+            </button>
+
+        </form>
+
+        <div
+            id="requestMessage"
+            class="request-message"
+            role="status"
+            aria-live="polite"
+            hidden
+        ></div>
+
+        <p class="back-link">
+            <a href="dashboard.html">← Back to Dashboard</a>
+        </p>
+
+    </main>
+
+    <footer>
+        <p>© 2026 RaktaSetu | A Bridge Between Donors and Lives</p>
+    </footer>
+
+    <script>
+        const requestForm = document.getElementById("requestForm");
+        const requestMessage = document.getElementById("requestMessage");
+        const requiredDate = document.getElementById("requiredDate");
+
+        // Set today's date as the earliest required date
+        const now = new Date();
+
+        const today = [
+            now.getFullYear(),
+            String(now.getMonth() + 1).padStart(2, "0"),
+            String(now.getDate()).padStart(2, "0")
+        ].join("-");
+
+        requiredDate.min = today;
+
+        // Read selected blood group and location from Find Blood page
+        const params = new URLSearchParams(window.location.search);
+        const selectedGroup = params.get("bloodGroup");
+        const selectedCity = params.get("city");
+
+        if (selectedGroup) {
+            const bloodGroupInput = document.getElementById("bloodGroup");
+
+            if ([...bloodGroupInput.options].some(
+                option => option.value === selectedGroup
+            )) {
+                bloodGroupInput.value = selectedGroup;
+            }
+        }
+
+        if (selectedCity) {
+            document.getElementById("hospitalLocation").value = selectedCity;
+        }
+
+        requestForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const units = Number(document.getElementById("units").value);
+            const date = requiredDate.value;
+
+            if (!Number.isInteger(units) || units < 1) {
+                alert("Please enter a valid whole number of units.");
+                return;
+            }
+
+            if (!date || date < today) {
+                alert("Please select today or a future date.");
+                requiredDate.focus();
+                return;
+            }
+
+            // Demonstration ID only; a backend should generate unique IDs
+            const requestId =
+                "REQ" + Date.now().toString().slice(-8);
+
+            requestMessage.hidden = false;
+            requestMessage.style.background = "#FFF4E3";
+            requestMessage.style.color = "#6D1428";
+
+            requestMessage.replaceChildren();
+
+            const heading = document.createElement("h3");
+            heading.textContent = "Request Form Submitted!";
+
+            const idText = document.createElement("p");
+            idText.textContent = "Demo Request ID: ";
+
+            const idValue = document.createElement("span");
+            idValue.className = "request-id";
+            idValue.textContent = requestId;
+            idText.appendChild(idValue);
+
+            const statusText = document.createElement("p");
+            statusText.textContent =
+                "Demo Status: Pending (not saved to a database)";
+
+            const instruction = document.createElement("p");
+            instruction.textContent =
+                "Keep this ID for demonstration. Permanent tracking requires backend integration.";
+
+            requestMessage.append(
+                heading,
+                idText,
+                statusText,
+                instruction
+            );
+
+            requestForm.reset();
+        });
+
+        requestForm.addEventListener("reset", function() {
+            requestMessage.hidden = true;
+            requestMessage.replaceChildren();
+        });
+    </script>
+
+</body>
+</html>

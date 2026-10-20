@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RaktSetu | Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="dashboard-page">
+
+    <header class="dashboard-header">
+        <div class="dashboard-brand">
+            <span class="brand-icon">🩸</span>
+            <div>
+                <h1>RaktSetu</h1>
+                <p>A Bridge Between Donors and Lives</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+
+        <section class="dashboard-welcome">
+            <h2>Welcome to RaktSetu!</h2>
+            <p>
+                Every drop counts. Choose an option below to manage
+                blood donations and requests.
+            </p>
+        </section>
+
+        <section class="dashboard-grid">
+
+            <!-- 1. Register Donor -->
+            <a href="registerdonor.html" class="dashboard-card">
+                <span class="card-icon">🩸</span>
+                <h3>Register Donor</h3>
+                <p>Register a new blood donor.</p>
+                <span class="card-link">Open Section →</span>
+            </a>
+
+            <!-- 2. View Donors -->
+            <a href="viewdonors.html" class="dashboard-card">
+                <span class="card-icon">👥</span>
+                <h3>View Donors</h3>
+                <p>View the list of registered donors.</p>
+                <span class="card-link">Open Section →</span>
+            </a>
+
+            <!-- 3. Find Blood -->
+            <a href="findblood.html" class="dashboard-card">
+                <span class="card-icon">🔍</span>
+                <h3>Find Blood</h3>
+                <p>Search for available blood groups.</p>
+                <span class="card-link">Open Section →</span>
+            </a>
+
+            <!-- 4. Blood Stock -->
+            <a href="bloodstock.html" class="dashboard-card">
+                <span class="card-icon">🏥</span>
+                <h3>Blood Stock</h3>
+                <p>Check available blood stock.</p>
+                <span class="card-link">Open Section →</span>
+            </a>
+
+            <!-- 5. Blood Request -->
+            <a href="bloodrequest.html" class="dashboard-card">
+                <span class="card-icon">📋</span>
+                <h3>Blood Request</h3>
+                <p>Submit a request for blood.</p>
+                <span class="card-link">Open Section →</span>
+            </a>
+
+            <!-- 6. Request Status -->
+            <a href="requeststatus.html" class="dashboard-card">
+                <span class="card-icon">📌</span>
+                <h3>Request Status</h3>
+                <p>Check the status of a blood request.</p>
+                <span class="card-link">Open Section →</span>
+            </a>
+
+        </section>
+
+        <!-- Logout at the bottom -->
+        <div class="dashboard-logout">
+            <a href="index.html" class="btn logout-btn"
+               onclick="return confirm('Are you sure you want to logout?')">
+                Logout
+            </a>
+        </div>
+
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 RaktSetu | A Bridge Between Donors and Lives</p>
+    </footer>
+
+</body>
+</html>

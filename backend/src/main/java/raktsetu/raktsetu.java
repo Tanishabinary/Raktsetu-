@@ -1,5 +1,6 @@
-package backend.src.main.java.raktsetu;
-
+ package raktsetu;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.io.File;
@@ -7,7 +8,7 @@ import java.io.FileWriter;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-
+@SpringBootApplication
 public class raktsetu {
 
     static ArrayList<Donor> donors = new ArrayList<Donor>();
@@ -30,6 +31,7 @@ public static void main(String[] args) {
     DonorFile.loadDonors(donors);
     BloodStockFile.loadStock(stocks);
     loadRequests();
+    SpringApplication.run(raktsetu.class, args);
 
     for (Donor donor : donors) {
         if (donor.donorId >= nextId) {

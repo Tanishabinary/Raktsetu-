@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | RaktSetu</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header class="brand">
+        <h1>RAKTSETU</h1>
+        <h3>A Bridge Between Donors and Lives</h3>
+    </header>
+
+    <main class="form-card">
+
+        <h2>Welcome Back!</h2>
+
+        <p class="description">
+            Login to your RaktSetu account to connect with blood donation services.
+        </p>
+
+        <form id="loginForm">
+
+            <label for="email">Email Address</label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter your email address"
+                required
+            >
+
+            <label for="password">Password</label>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter your password"
+                required
+            >
+
+            <button type="submit" class="btn btn-primary">
+                Login
+            </button>
+
+        </form>
+
+        <p class="login-link">
+            Don't have an account?
+            <a href="createaccount.html">Create Account</a>
+        </p>
+
+        <p class="back-link">
+            <a href="index.html">← Back to Home</a>
+        </p>
+
+    </main>
+
+    <footer>
+        <p>© 2026 RaktSetu | A Bridge Between Donors and Lives</p>
+    </footer>
+
+    <script>
+       const loginForm = document.getElementById("loginForm");
+
+        loginForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            try {
+                const response = await fetch("https://raktsetu-backend-j8ue.onrender.com/api/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert("Login successful! Welcome back, " + (result.name || "User"));
+                    // Save user info locally
+                    localStorage.setItem("user", JSON.stringify(result));
+                    // Redirect to dashboard
+                    window.location.href = "dashboard.html";
+                } else {
+                    alert(result.message || "Invalid email or password.");
+                }
+            } catch (error) {
+                console.error("Connection Error:", error);
+                alert("Unable to connect to backend server. Make sure node server.js is running!");
+            }
+        });
+    </script>
+
+</body>
+</html>
