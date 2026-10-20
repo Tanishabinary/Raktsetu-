@@ -23,10 +23,7 @@ public class raktsetu {
     static int nextRequestId = 1;
 
     static final String REQUEST_FILE = "blood_requests.txt";
-
-    
-
-public static void main(String[] args) {
+    public static void main(String[] args) {
 
     DonorFile.loadDonors(donors);
     BloodStockFile.loadStock(stocks);
@@ -39,46 +36,61 @@ public static void main(String[] args) {
         }
     }
 
-    int choice = 0;
+    // ONLY run the interactive terminal menu if a real console is available (Local PC)
+    if (System.console() != null) {
+        int choice = 0;
 
-    while (choice != 6) {
+        while (choice != 6) {
 
-        System.out.println("\n===== RAKTSETU =====");
-        System.out.println("1. Register Donor");
-        System.out.println("2. View Donors");
-        System.out.println("3. Search Blood Group");
-        System.out.println("4. Blood Stock Management");
-        System.out.println("5. Blood Request Management");
-        System.out.println("6. Exit");
+            System.out.println("\n===== RAKTSETU =====");
+            System.out.println("1. Register Donor");
+            System.out.println("2. View Donors");
+            System.out.println("3. Search Blood Group");
+            System.out.println("4. Blood Stock Management");
+            System.out.println("5. Blood Request Management");
+            System.out.println("6. Exit");
 
-        System.out.print("Enter choice: ");
+            System.out.print("Enter choice: ");
 
-        try {
-            choice = Integer.parseInt(sc.nextLine());
+            try {
+                choice = Integer.parseInt(sc.nextLine());
 
-            if (choice == 1) {
-                registerDonor();
-            } else if (choice == 2) {
-                viewDonors();
-            } else if (choice == 3) {
-                searchDonor();
-            } else if (choice == 4) {
-                manageStock();
-            } else if (choice == 5) {
-                manageRequests();
-            } else if (choice == 6) {
-                System.out.println("Thank you for using RaktSetu!");
-            } else {
-                System.out.println("Invalid choice!");
+                if (choice == 1) {
+                    registerDonor();
+                } else if (choice == 2) {
+                    viewDonors();
+                } else if (choice == 3) {
+                    searchDonor();
+                } else if (choice == 4) {
+                    manageStock();
+                } else if (choice == 5) {
+                    manageRequests();
+                } else if (choice == 6) {
+                    System.out.println("Thank you for using RaktSetu!");
+                } else {
+                    System.out.println("Invalid choice!");
+                }
+
+            } catch (NumberFormatException e) {
+                System.out.println("Enter a valid number!");
             }
+        }
 
-        } catch (NumberFormatException e) {
-            System.out.println("Enter a valid number!");
+        sc.close();
+    } else {
+        // On Render (Cloud): Keeps the server alive without crashing on missing input
+        System.out.println("Running in cloud environment. Web server active.");
+        try {
+            Thread.currentThread().join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
-
-    sc.close();
 }
+
+    
+
+
 
     // REGISTER DONOR
     static void registerDonor() {
