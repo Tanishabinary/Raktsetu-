@@ -30,7 +30,8 @@ ageInput.addEventListener("input", checkAgeEligibility);
 donatedBefore.addEventListener("change", checkAgeEligibility);
 
 
-fetch('http://localhost:3000/api/bloodrequests')
+// Use a relative path so it automatically works locally and on Render
+fetch('/api/requests')
     .then(response => response.json())
     .then(data => console.log("Backend says:", data))
     .catch(error => console.error("Connection error:", error));
