@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Stock | RaktSetu</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .stock-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .summary-card {
+            background: #6D1428;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            margin: 0 0 8px;
+        }
+
+        .summary-card p {
+            font-size: 26px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .stock-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .stock-table th,
+        .stock-table td {
+            padding: 12px;
+            border: 1px solid #eadbd7;
+            text-align: center;
+        }
+
+        .stock-table th {
+            background: #6D1428;
+            color: white;
+        }
+
+        .stock-table tr:nth-child(even) {
+            background: #FFF4E3;
+        }
+
+        .stock-form {
+            margin-top: 25px;
+            padding: 20px;
+            background: #FFF4E3;
+            border-radius: 10px;
+        }
+
+        .stock-form h3 {
+            margin-top: 0;
+        }
+
+        .stock-note {
+            font-size: 14px;
+            margin: 15px 0;
+        }
+
+        .status-message {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    
+        /* RaktaSetu Logo */
+        .brand-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .brand-logo img {
+            width: 180px;
+            max-width: 80%;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="brand">
+        <div class="brand-logo">
+            <img src="raktsetu-logo.jpeg"
+                 alt="RaktSetu - The Bridge Between Donors and Lives">
+        </div>
+        <h3>A Bridge Between Donors and Lives</h3>
+    </header>
+
+
+    <main class="form-card">
+
+        <h2>Blood Stock Management</h2>
+
+        <p class="description">
+            View and manage blood-group-wise inventory.
+        </p>
+
+        <section class="stock-summary">
+            <div class="summary-card">
+                <h3>Blood Groups</h3>
+                <p id="groupCount">8</p>
+            </div>
+
+            <div class="summary-card">
+                <h3>Total Units</h3>
+                <p id="totalUnits">35</p>
+            </div>
+        </section>
+
+        <h3>Available Stock</h3>
+
+        <div class="table-container">
+            <table class="stock-table">
+                <thead>
+                    <tr>
+                        <th>Blood Group</th>
+                        <th>Units Available</th>
+                        <th>Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody id="stockTableBody"></tbody>
+            </table>
+        </div>
+
+        <section class="stock-form">
+            <h3>Add / Update Stock</h3>
+
+            <form id="stockForm">
+
+                <label for="bloodGroup">Blood Group *</label>
+                <select id="bloodGroup" required>
+                    <option value="">Select blood group</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                </select>
+
+                <label for="units">Units to Add or Remove *</label>
+                <input
+                    type="number"
+                    id="units"
+                    min="1"
+                    step="1"
+                    placeholder="Enter number of units"
+                    required
+                >
+
+                <label for="operation">Operation *</label>
+                <select id="operation" required>
+                    <option value="add">Add Stock</option>
+                    <option value="remove">Issue / Remove Stock</option>
+                </select>
+
+                <button type="submit" class="btn btn-primary">
+                    Update Stock
+                </button>
+
+            </form>
+
+            <p id="statusMessage" class="status-message" role="status"></p>
+        </section>
+
+        <p class="stock-note">
+            <strong>Important:</strong> These are illustrative sample values.
+            In a real system, only authorized staff should update verified
+            blood-bank inventory. Issued units must be recorded correctly.
+        </p>
+
+        <p class="back-link">
+            <a href="dashboard.html">← Back to Dashboard</a>
+        </p>
+
+    </main>
+
+    <footer>
+        <p>© 2026 RaktaSetu | A Bridge Between Donors and Lives</p>
+    </footer>
+
+    <script>
+        // Sample inventory for frontend demonstration only
+        const stock = {
+            "A+": 8,
+            "A-": 2,
+            "B+": 6,
+            "B-": 1,
+            "AB+": 4,
+            "AB-": 1,
+            "O+": 10,
+            "O-": 3
+        };
+
+        const lastUpdated = {};
+        const stockForm = document.getElementById("stockForm");
+        const stockTableBody = document.getElementById("stockTableBody");
+        const totalUnitsElement = document.getElementById("totalUnits");
+        const statusMessage = document.getElementById("statusMessage");
+
+        function getToday() {
+            const now = new Date();
+
+            return [
+                now.getFullYear(),
+                String(now.getMonth() + 1).padStart(2, "0"),
+                String(now.getDate()).padStart(2, "0")
+            ].join("-");
+        }
+
+        function renderStock() {
+            stockTableBody.replaceChildren();
+
+            let total = 0;
+
+            Object.keys(stock).forEach(function(group) {
+                total += stock[group];
+
+                const row = document.createElement("tr");
+
+                const groupCell = document.createElement("td");
+                groupCell.textContent = group;
+
+                const unitsCell = document.createElement("td");
+                unitsCell.textContent = stock[group];
+
+                const dateCell = document.createElement("td");
+                dateCell.textContent = lastUpdated[group] || "Sample data";
+
+                row.appendChild(groupCell);
+                row.appendChild(unitsCell);
+                row.appendChild(dateCell);
+
+                stockTableBody.appendChild(row);
+            });
+
+            totalUnitsElement.textContent = total;
+        }
+
+        stockForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const group = document.getElementById("bloodGroup").value;
+            const units = Number(document.getElementById("units").value);
+            const operation = document.getElementById("operation").value;
+
+            if (!group || !Number.isInteger(units) || units < 1) {
+                statusMessage.textContent =
+                    "Please select a blood group and enter a whole number greater than zero.";
+                statusMessage.style.color = "#C62828";
+                return;
+            }
+
+            if (operation === "remove" && units > stock[group]) {
+                statusMessage.textContent =
+                    "Cannot remove more units than are currently available.";
+                statusMessage.style.color = "#C62828";
+                return;
+            }
+
+            if (operation === "add") {
+                stock[group] += units;
+            } else {
+                stock[group] -= units;
+            }
+
+            lastUpdated[group] = getToday();
+
+            renderStock();
+
+            statusMessage.textContent =
+                "Demo stock updated successfully. Changes are not saved to a database.";
+            statusMessage.style.color = "#276738";
+
+            stockForm.reset();
+        });
+
+        renderStock();
+    </script>
+
+</body>
+</html>

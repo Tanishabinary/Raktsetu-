@@ -1,0 +1,244 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Blood | RaktaSetu</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .search-form {
+            margin-top: 20px;
+        }
+
+        .search-btn {
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .results-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 25px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        .results-table th,
+        .results-table td {
+            padding: 12px;
+            border: 1px solid #eadbd7;
+            text-align: left;
+        }
+
+        .results-table th {
+            background: #6D1428;
+            color: white;
+        }
+
+        .results-table tr:nth-child(even) {
+            background: #FFF4E3;
+        }
+
+        .request-btn {
+            background: #C62828;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .message {
+            margin-top: 18px;
+            text-align: center;
+        }
+
+        .stock-note {
+            background: #FFF4E3;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 18px;
+            font-size: 14px;
+        }
+
+ /* RaktaSetu Logo */
+        .brand-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .brand-logo img {
+            width: 180px;
+            max-width: 80%;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="brand">
+        <div class="brand-logo">
+            <img src="raktsetu-logo.jpeg"
+                 alt="RaktSetu - The Bridge Between Donors and Lives">
+        </div>
+        <h3>A Bridge Between Donors and Lives</h3>
+    </header>
+
+
+
+    <main class="form-card">
+
+        <h2>Find Available Blood</h2>
+
+        <p class="description">
+            Search for available blood stock in your preferred location.
+        </p>
+
+        <form id="findBloodForm" class="search-form">
+
+            <label for="bloodGroup">Blood Group *</label>
+            <select id="bloodGroup" required>
+                <option value="">Choose blood group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+            </select>
+
+            <label for="city">City / Location</label>
+            <input
+                type="text"
+                id="city"
+                placeholder="Enter city or area"
+            >
+
+            <button type="submit" class="btn btn-primary search-btn">
+                Search Blood
+            </button>
+
+        </form>
+
+        <h3>Search Results</h3>
+
+        <div class="results-container">
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Blood Group</th>
+                        <th>Location</th>
+                        <th>Units Available</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="resultsBody"></tbody>
+            </table>
+        </div>
+
+        <p id="resultMessage" class="message" role="status"></p>
+
+        <p class="stock-note">
+            <strong>Note:</strong> The displayed records are sample data
+            for demonstration. Confirm actual availability with an
+            authorized blood bank before making arrangements.
+        </p>
+
+        <p class="back-link">
+            <a href="dashboard.html">← Back to Dashboard</a>
+        </p>
+
+    </main>
+
+    <footer>
+        <p>© 2026 RaktaSetu | A Bridge Between Donors and Lives</p>
+    </footer>
+
+    <script>
+        // Sample data for frontend testing only
+        const bloodStock = [
+            { bloodGroup: "O+", city: "Thane", units: 5 },
+            { bloodGroup: "A+", city: "Mumbai", units: 3 },
+            { bloodGroup: "B+", city: "Thane", units: 6 },
+            { bloodGroup: "O-", city: "Mumbai", units: 2 },
+            { bloodGroup: "AB+", city: "Navi Mumbai", units: 4 },
+            { bloodGroup: "A-", city: "Thane", units: 2 }
+        ];
+
+        const findBloodForm = document.getElementById("findBloodForm");
+        const bloodGroupInput = document.getElementById("bloodGroup");
+        const cityInput = document.getElementById("city");
+        const resultsBody = document.getElementById("resultsBody");
+        const resultMessage = document.getElementById("resultMessage");
+
+        findBloodForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const selectedGroup = bloodGroupInput.value;
+            const selectedCity = cityInput.value.trim().toLowerCase();
+
+            const matches = bloodStock.filter(function(item) {
+                const groupMatches = item.bloodGroup === selectedGroup;
+
+                const cityMatches =
+                    selectedCity === "" ||
+                    item.city.toLowerCase().includes(selectedCity);
+
+                return groupMatches && cityMatches;
+            });
+
+            resultsBody.replaceChildren();
+
+            matches.forEach(function(item) {
+                const row = document.createElement("tr");
+
+                [item.bloodGroup, item.city, item.units].forEach(function(value) {
+                    const cell = document.createElement("td");
+                    cell.textContent = value;
+                    row.appendChild(cell);
+                });
+
+                const actionCell = document.createElement("td");
+                const requestButton = document.createElement("button");
+
+                requestButton.type = "button";
+                requestButton.className = "request-btn";
+                requestButton.textContent = "Request Blood";
+
+                requestButton.addEventListener("click", function() {
+                    window.location.href =
+                        "bloodrequest.html?bloodGroup=" +
+                        encodeURIComponent(item.bloodGroup) +
+                        "&city=" + encodeURIComponent(item.city);
+                });
+
+                actionCell.appendChild(requestButton);
+                row.appendChild(actionCell);
+                resultsBody.appendChild(row);
+            });
+
+            resultMessage.textContent = matches.length > 0
+                ? matches.length + " matching stock record(s) found."
+                : "No matching blood stock found.";
+
+            resultMessage.style.color =
+                matches.length > 0 ? "#276738" : "#C62828";
+        });
+    </script>
+
+</body>
+</html>
