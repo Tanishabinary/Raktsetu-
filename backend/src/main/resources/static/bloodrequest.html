@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -244,25 +243,40 @@
             // Generate demo Request ID instantly
             const requestId = "REQ" + Date.now().toString().slice(-8);
 
-            // Map fields for your Spring Boot backend
+            const hospitalName = document.getElementById("hospitalName").value;
+            const hospitalLocation = document.getElementById("hospitalLocation").value;
+            const fullHospitalStr = hospitalName + ", " + hospitalLocation;
+
+            // Map fields for your Spring Boot backend & Local Storage
             const requestData = {
                 patientName: document.getElementById("patientName").value,
                 bloodGroup: document.getElementById("bloodGroup").value,
                 units: units,
-                hospitalName: document.getElementById("hospitalName").value,
-                hospitalLocation: document.getElementById("hospitalLocation").value,
+                hospitalName: hospitalName,
+                hospitalLocation: hospitalLocation,
                 contactNumber: document.getElementById("contact").value,
                 requiredDate: date,
                 urgency: document.getElementById("urgency").value,
                 reason: document.getElementById("reason").value
             };
 
+            // Save to localStorage so requeststatus.html displays the exact hospital entered!
+            const requestRecord = {
+                patient: requestData.patientName,
+                bloodGroup: requestData.bloodGroup,
+                units: requestData.units,
+                hospital: fullHospitalStr,
+                urgency: requestData.urgency,
+                status: "Pending (In Processing)"
+            };
+            localStorage.setItem(requestId, JSON.stringify(requestRecord));
+
             // 1. Reset the form inputs FIRST so they clear out
             requestForm.reset();
 
-            // 2. Build and show the success message AFTER resetting, ensuring it stays visible
+            // 2. Build and show the success message AFTER resetting
             requestMessage.hidden = false;
-            requestMessage.style.display = "block"; // Forces it to stay visible
+            requestMessage.style.display = "block";
             requestMessage.style.background = "#FFF4E3";
             requestMessage.style.color = "#6D1428";
 
@@ -292,9 +306,9 @@
                 instruction
             );
 
-            // Send data to your Spring Boot backend in the background
+            // Send data to your Spring Boot backend on Render in the background
             try {
-                await fetch("/api/requests", {
+                await fetch("https://raktsetu-vryn.onrender.com/api/requests", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -305,15 +319,7 @@
                 console.error("Background Connection Error:", error);
             }
         });
-
-        // Only clear the message if the explicit "Clear Form" button is clicked
-        requestForm.addEventListener("reset", function(event) {
-            // We let the form reset inputs, but we keep our success message visible unless intended otherwise
-        });
     </script>
-        
-        
-    
 
 </body>
 </html>

@@ -245,10 +245,28 @@
                 return;
             }
 
-            // Extract numbers from the input
+            // 2. Check browser localStorage for dynamically submitted requests (shows the exact hospital entered!)
+            const savedRecord = localStorage.getItem(requestId);
+            if (savedRecord) {
+                const request = JSON.parse(savedRecord);
+                document.getElementById("detailId").textContent = requestId;
+                document.getElementById("detailPatient").textContent = request.patient;
+                document.getElementById("detailGroup").textContent = request.bloodGroup;
+                document.getElementById("detailUnits").textContent = request.units;
+                document.getElementById("detailHospital").textContent = request.hospital;
+                document.getElementById("detailUrgency").textContent = request.urgency;
+                document.getElementById("detailStatus").textContent = request.status;
+
+                statusMessage.textContent = "Live request record found!";
+                statusMessage.style.color = "#276738";
+                requestDetails.hidden = false;
+                return;
+            }
+
+            // Extract numbers from the input for backend check
             const numericId = rawInput.replace(/[^0-9]/g, "");
 
-            // 2. Query the live Render backend database
+            // 3. Query the live Render backend database
             if (numericId) {
                 statusMessage.textContent = "Searching database...";
                 statusMessage.style.color = "#555";
@@ -274,28 +292,12 @@
                         }
                     }
                 } catch (error) {
-                    console.warn("Backend lookup failed, using demo fallback:", error);
+                    console.warn("Backend lookup failed:", error);
                 }
             }
 
-            // 3. Demo Fallback for generated request IDs (e.g., REQ88102438)
-            if (requestId.startsWith("REQ") || numericId.length >= 4) {
-                document.getElementById("detailId").textContent = requestId;
-                document.getElementById("detailPatient").textContent = "Recent Submitted Patient";
-                document.getElementById("detailGroup").textContent = "O+";
-                document.getElementById("detailUnits").textContent = "2";
-                document.getElementById("detailHospital").textContent = "General Hospital, Thane";
-                document.getElementById("detailUrgency").textContent = "Urgent";
-                document.getElementById("detailStatus").textContent = "Pending (In Processing)";
-
-                statusMessage.textContent = "Request received and currently under processing.";
-                statusMessage.style.color = "#276738";
-                requestDetails.hidden = false;
-                return;
-            }
-
-            // 4. Default error message
-            statusMessage.textContent = "No sample request found with this ID. Please check the ID or use REQ1001, REQ1002, REQ1003, or REQ1004 to test the page.";
+            // 4. Default error message if ID is not found anywhere
+            statusMessage.textContent = "No request found with this ID. Please check the ID or use REQ1001, REQ1002, REQ1003, or REQ1004.";
             statusMessage.style.color = "#C62828";
         });
 
