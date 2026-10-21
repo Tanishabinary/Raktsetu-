@@ -206,8 +206,8 @@
     </footer>
 
     <script>
-        // Sample inventory for frontend demonstration only
-        const stock = {
+        // Load stock from localStorage if available, otherwise use default sample data
+        let stock = JSON.parse(localStorage.getItem('raktsetu_stock')) || {
             "A+": 8,
             "A-": 2,
             "B+": 6,
@@ -218,7 +218,9 @@
             "O-": 3
         };
 
-        const lastUpdated = {};
+        // Load lastUpdated dates from localStorage if available
+        let lastUpdated = JSON.parse(localStorage.getItem('raktsetu_lastUpdated')) || {};
+
         const stockForm = document.getElementById("stockForm");
         const stockTableBody = document.getElementById("stockTableBody");
         const totalUnitsElement = document.getElementById("totalUnits");
@@ -226,7 +228,6 @@
 
         function getToday() {
             const now = new Date();
-
             return [
                 now.getFullYear(),
                 String(now.getMonth() + 1).padStart(2, "0"),
@@ -251,6 +252,7 @@
                 unitsCell.textContent = stock[group];
 
                 const dateCell = document.createElement("td");
+                // If there's a stored date, show it; otherwise fallback to "Sample data"
                 dateCell.textContent = lastUpdated[group] || "Sample data";
 
                 row.appendChild(groupCell);
@@ -292,10 +294,14 @@
 
             lastUpdated[group] = getToday();
 
+            // Save updated data to browser's localStorage
+            localStorage.setItem('raktsetu_stock', JSON.stringify(stock));
+            localStorage.setItem('raktsetu_lastUpdated', JSON.stringify(lastUpdated));
+
             renderStock();
 
             statusMessage.textContent =
-                "Demo stock updated successfully. Changes are not saved to a database.";
+                "Stock updated successfully and saved to local storage.";
             statusMessage.style.color = "#276738";
 
             stockForm.reset();

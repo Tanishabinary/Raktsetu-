@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,7 +59,7 @@
             <a href="bloodstock.html" class="dashboard-card">
                 <span class="card-icon">🏥</span>
                 <h3>Blood Stock</h3>
-                <p>Check available blood stock.</p>
+                <p id="stockCardText">Check available blood stock.</p>
                 <span class="card-link">Open Section →</span>
             </a>
 
@@ -95,6 +94,19 @@
     <footer class="footer">
         <p>© 2026 RaktSetu | A Bridge Between Donors and Lives</p>
     </footer>
+
+    <script>
+        // Dynamically load stock data to show total units on the dashboard card
+        document.addEventListener("DOMContentLoaded", function() {
+            const savedStock = JSON.parse(localStorage.getItem('raktsetu_stock'));
+            const stockCardText = document.getElementById("stockCardText");
+
+            if (savedStock) {
+                let totalUnits = Object.values(savedStock).reduce((sum, units) => sum + units, 0);
+                stockCardText.textContent = `Total units available: ${totalUnits}`;
+            }
+        });
+    </script>
 
 </body>
 </html>
