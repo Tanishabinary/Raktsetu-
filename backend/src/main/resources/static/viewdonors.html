@@ -151,12 +151,9 @@
     </footer>
 
     <script>
-        /*
-          Illustrative sample data for frontend testing.
-          Replace this array with backend/database records
-          when your backend is integrated.
-        */
-        const donors = [
+       
+        // 1. Start with your sample/demo donors, and add a place to hold live backend data
+        let donors = [
             {
                 name: "Sample Donor",
                 bloodGroup: "O+",
@@ -175,6 +172,34 @@
         const bloodFilter = document.getElementById("bloodFilter");
         const donorTableBody = document.getElementById("donorTableBody");
         const emptyMessage = document.getElementById("emptyMessage");
+
+        // 2. Fetch live registered donors from your Spring Boot backend
+        async function fetchLiveDonors() {
+            try {
+                const response = await fetch('/api/donors');
+                const data = await response.json();
+                
+                // Map Java backend fields to your table's format
+                const backendDonors = data.map(function(d) {
+                    return {
+                        name: d.name,
+                        bloodGroup: d.bloodGroup,
+                        city: d.city,
+                        contact: d.phone
+                    };
+                });
+
+                // Combine sample/demo donors with live backend donors
+                donors = [...donors, ...backendDonors];
+
+                // Re-render the table with the combined list
+                renderDonors();
+            } catch (error) {
+                console.error("Error fetching live donors:", error);
+                // Even if the backend fails, the sample/demo donors will still display
+                renderDonors();
+            }
+        }
 
         function renderDonors() {
             const searchText = searchInput.value.trim().toLowerCase();
@@ -242,8 +267,10 @@
         searchInput.addEventListener("input", renderDonors);
         bloodFilter.addEventListener("change", renderDonors);
 
-        renderDonors();
+        // Fetch live data when the page loads
+        fetchLiveDonors();
     </script>
+    
 
 </body>
 </html>
