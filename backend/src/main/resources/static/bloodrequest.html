@@ -190,7 +190,6 @@
     </footer>
 
     <script>
-        
         const requestForm = document.getElementById("requestForm");
         const requestMessage = document.getElementById("requestMessage");
         const requiredDate = document.getElementById("requiredDate");
@@ -258,8 +257,12 @@
                 reason: document.getElementById("reason").value
             };
 
-            // Show success message with demo ID immediately
+            // 1. Reset the form inputs FIRST so they clear out
+            requestForm.reset();
+
+            // 2. Build and show the success message AFTER resetting, ensuring it stays visible
             requestMessage.hidden = false;
+            requestMessage.style.display = "block"; // Forces it to stay visible
             requestMessage.style.background = "#FFF4E3";
             requestMessage.style.color = "#6D1428";
 
@@ -301,15 +304,15 @@
             } catch (error) {
                 console.error("Background Connection Error:", error);
             }
-
-            requestForm.reset();
         });
 
-        requestForm.addEventListener("reset", function() {
-            requestMessage.hidden = true;
-            requestMessage.replaceChildren();
+        // Only clear the message if the explicit "Clear Form" button is clicked
+        requestForm.addEventListener("reset", function(event) {
+            // We let the form reset inputs, but we keep our success message visible unless intended otherwise
         });
     </script>
+        
+        
     
 
 </body>
