@@ -1,7 +1,17 @@
 package raktsetu;
+
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import java.util.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -20,18 +30,15 @@ public class ApiController {
             String phone = (String) donorData.get("phone");
             String city = (String) donorData.get("city");
 
-            // Validate using your existing Java logic
             if (name == null || age < 18 || age > 65 || !raktsetu.isValidGroup(bloodGroup)) {
                 response.put("status", "error");
                 response.put("message", "Invalid donor details!");
                 return response;
             }
 
-            // Create Donor using your existing Donor class
             Donor d = new Donor(raktsetu.nextId, name, age, bloodGroup, phone, city);
             raktsetu.donors.add(d);
             
-            // Save to text file using your existing DonorFile class
             DonorFile.saveDonors(raktsetu.donors);
 
             raktsetu.nextId++;
@@ -70,11 +77,9 @@ public class ApiController {
                 return response;
             }
 
-            // Create BloodRequest using your existing BloodRequest class
             BloodRequest r = new BloodRequest(raktsetu.nextRequestId, patientName, bloodGroup, units, urgency);
             raktsetu.requests.add(r);
 
-            // Save to file using your existing save method
             raktsetu.saveRequests();
 
             raktsetu.nextRequestId++;
@@ -95,7 +100,28 @@ public class ApiController {
     public List<BloodRequest> getAllRequests() {
         return raktsetu.requests;
     }
+
+    // 5. GET REQUEST STATUS BY ID
+    @GetMapping("/requests/status/{id}")
+    public Map<String, Object> getRequestStatus(@PathVariable int id) {
+        Map<String, Object> response = new HashMap<>();
+        
+        for (BloodRequest req : raktsetu.requests) {
+            if (req.requestId == id) {
+                response.put("status", "success");
+                response.put("requestStatus", req.status);
+                response.put("patientName", req.patientName);
+                response.put("bloodGroup", req.bloodGroup);
+                return response;
+            }
+        }
+        
+        response.put("status", "error");
+        response.put("message", "Request ID not found!");
+        return response;
+    }
 }
+
 @Controller
 class WebController {
     @GetMapping("/")

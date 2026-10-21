@@ -223,34 +223,65 @@
         const statusMessage = document.getElementById("statusMessage");
         const requestDetails = document.getElementById("requestDetails");
 
-        statusForm.addEventListener("submit", function(event) {
+        statusForm.addEventListener("submit", async function(event) {
             event.preventDefault();
 
-            const requestId = requestIdInput.value.trim().toUpperCase();
-            const request = requests[requestId];
+            const rawInput = requestIdInput.value.trim();
+            const requestId = rawInput.toUpperCase();
 
             requestDetails.hidden = true;
 
-            if (!request) {
-                statusMessage.textContent =
-                    "No sample request found with this ID. Please check the ID or use REQ1001, REQ1002, REQ1003, or REQ1004 to test the page.";
-                statusMessage.style.color = "#C62828";
+            // 1. Check if it matches a local sample record first
+            if (requests[requestId]) {
+                const request = requests[requestId];
+                document.getElementById("detailId").textContent = requestId;
+                document.getElementById("detailPatient").textContent = request.patient;
+                document.getElementById("detailGroup").textContent = request.bloodGroup;
+                document.getElementById("detailUnits").textContent = request.units;
+                document.getElementById("detailHospital").textContent = request.hospital;
+                document.getElementById("detailUrgency").textContent = request.urgency;
+                document.getElementById("detailStatus").textContent = request.status;
+
+                statusMessage.textContent = "Sample request record found.";
+                statusMessage.style.color = "#276738";
+                requestDetails.hidden = false;
                 return;
             }
 
-            document.getElementById("detailId").textContent = requestId;
-            document.getElementById("detailPatient").textContent = request.patient;
-            document.getElementById("detailGroup").textContent = request.bloodGroup;
-            document.getElementById("detailUnits").textContent = request.units;
-            document.getElementById("detailHospital").textContent = request.hospital;
-            document.getElementById("detailUrgency").textContent = request.urgency;
-            document.getElementById("detailStatus").textContent = request.status;
+            // 2. If not found locally, query the live backend database
+            try {
+                const numericId = rawInput.replace(/[^0-9]/g, "");
+                if (!numericId) {
+                    throw new Error("Invalid ID format");
+                }
 
-            statusMessage.textContent =
-                "Sample request record found.";
-            statusMessage.style.color = "#276738";
+                statusMessage.textContent = "Searching database...";
+                statusMessage.style.color = "#555";
 
-            requestDetails.hidden = false;
+                const response = await fetch(`/api/requests/status/${numericId}`);
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    document.getElementById("detailId").textContent = numericId;
+                    document.getElementById("detailPatient").textContent = result.patientName;
+                    document.getElementById("detailGroup").textContent = result.bloodGroup;
+                    document.getElementById("detailUnits").textContent = "N/A";
+                    document.getElementById("detailHospital").textContent = "Database Record";
+                    document.getElementById("detailUrgency").textContent = "N/A";
+                    document.getElementById("detailStatus").textContent = result.requestStatus;
+
+                    statusMessage.textContent = "Live database record found.";
+                    statusMessage.style.color = "#276738";
+                    requestDetails.hidden = false;
+                } else {
+                    statusMessage.textContent = "No sample request found with this ID. Please check the ID or use REQ1001, REQ1002, REQ1003, or REQ1004 to test the page.";
+                    statusMessage.style.color = "#C62828";
+                }
+            } catch (error) {
+                console.error("Error checking status:", error);
+                statusMessage.textContent = "No sample request found with this ID. Please check the ID or use REQ1001, REQ1002, REQ1003, or REQ1004 to test the page.";
+                statusMessage.style.color = "#C62828";
+            }
         });
 
         statusForm.addEventListener("reset", function() {
