@@ -169,75 +169,100 @@
     </footer>
 
     <script>
-        // Sample data for frontend testing only
-        const bloodStock = [
-            { bloodGroup: "O+", city: "Thane", units: 5 },
-            { bloodGroup: "A+", city: "Mumbai", units: 3 },
-            { bloodGroup: "B+", city: "Thane", units: 6 },
-            { bloodGroup: "O-", city: "Mumbai", units: 2 },
-            { bloodGroup: "AB+", city: "Navi Mumbai", units: 4 },
-            { bloodGroup: "A-", city: "Thane", units: 2 }
-        ];
+      // Sample data for frontend testing only
+    const bloodStock = [
+        { bloodGroup: "O+", city: "Thane", units: 5 },
+        { bloodGroup: "A+", city: "Mumbai", units: 3 },
+        { bloodGroup: "B+", city: "Thane", units: 6 },
+        { bloodGroup: "O-", city: "Mumbai", units: 2 },
+        { bloodGroup: "AB+", city: "Navi Mumbai", units: 4 },
+        { bloodGroup: "A-", city: "Thane", units: 2 }
+    ];
 
-        const findBloodForm = document.getElementById("findBloodForm");
-        const bloodGroupInput = document.getElementById("bloodGroup");
-        const cityInput = document.getElementById("city");
-        const resultsBody = document.getElementById("resultsBody");
-        const resultMessage = document.getElementById("resultMessage");
+    const findBloodForm = document.getElementById("findBloodForm");
+    const bloodGroupInput = document.getElementById("bloodGroup");
+    const cityInput = document.getElementById("city");
+    const resultsBody = document.getElementById("resultsBody");
+    const resultMessage = document.getElementById("resultMessage");
 
-        findBloodForm.addEventListener("submit", function(event) {
-            event.preventDefault();
+    findBloodForm.addEventListener("submit", async function(event) {
+        event.preventDefault();
 
-            const selectedGroup = bloodGroupInput.value;
-            const selectedCity = cityInput.value.trim().toLowerCase();
+        const selectedGroup = bloodGroupInput.value;
+        const selectedCity = cityInput.value.trim().toLowerCase();
 
-            const matches = bloodStock.filter(function(item) {
-                const groupMatches = item.bloodGroup === selectedGroup;
+        // 1. Filter local sample records
+        const matches = bloodStock.filter(function(item) {
+            const groupMatches = item.bloodGroup === selectedGroup;
 
-                const cityMatches =
-                    selectedCity === "" ||
-                    item.city.toLowerCase().includes(selectedCity);
+            const cityMatches =
+                selectedCity === "" ||
+                item.city.toLowerCase().includes(selectedCity);
 
-                return groupMatches && cityMatches;
-            });
-
-            resultsBody.replaceChildren();
-
-            matches.forEach(function(item) {
-                const row = document.createElement("tr");
-
-                [item.bloodGroup, item.city, item.units].forEach(function(value) {
-                    const cell = document.createElement("td");
-                    cell.textContent = value;
-                    row.appendChild(cell);
-                });
-
-                const actionCell = document.createElement("td");
-                const requestButton = document.createElement("button");
-
-                requestButton.type = "button";
-                requestButton.className = "request-btn";
-                requestButton.textContent = "Request Blood";
-
-                requestButton.addEventListener("click", function() {
-                    window.location.href =
-                        "bloodrequest.html?bloodGroup=" +
-                        encodeURIComponent(item.bloodGroup) +
-                        "&city=" + encodeURIComponent(item.city);
-                });
-
-                actionCell.appendChild(requestButton);
-                row.appendChild(actionCell);
-                resultsBody.appendChild(row);
-            });
-
-            resultMessage.textContent = matches.length > 0
-                ? matches.length + " matching stock record(s) found."
-                : "No matching blood stock found.";
-
-            resultMessage.style.color =
-                matches.length > 0 ? "#276738" : "#C62828";
+            return groupMatches && cityMatches;
         });
+
+        // 2. Fetch live donors from your Spring Boot backend and include them if they match
+        try {
+            const response = await fetch("https://raktsetu-vryn.onrender.com/api/donors");
+            if (response.ok) {
+                const liveDonors = await response.json();
+                
+                liveDonors.forEach(donor => {
+                    if (donor.bloodGroup === selectedGroup) {
+                        const donorCity = (donor.city || "").toLowerCase();
+                        if (selectedCity === "" || donorCity.includes(selectedCity)) {
+                            matches.push({
+                                bloodGroup: donor.bloodGroup,
+                                city: donor.city || "Registered Location",
+                                units: 1 // Individual registered donor unit
+                            });
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.warn("Could not fetch live donors, displaying sample stock only:", error);
+        }
+
+        // 3. Render all matched results in the table
+        resultsBody.replaceChildren();
+
+        matches.forEach(function(item) {
+            const row = document.createElement("tr");
+
+            [item.bloodGroup, item.city, item.units].forEach(function(value) {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+
+            const actionCell = document.createElement("td");
+            const requestButton = document.createElement("button");
+
+            requestButton.type = "button";
+            requestButton.className = "request-btn";
+            requestButton.textContent = "Request Blood";
+
+            requestButton.addEventListener("click", function() {
+                window.location.href =
+                    "bloodrequest.html?bloodGroup=" +
+                    encodeURIComponent(item.bloodGroup) +
+                    "&city=" + encodeURIComponent(item.city);
+            });
+
+            actionCell.appendChild(requestButton);
+            row.appendChild(actionCell);
+            resultsBody.appendChild(row);
+        });
+
+        resultMessage.textContent = matches.length > 0
+            ? matches.length + " matching stock record(s) found."
+            : "No matching blood stock found.";
+
+        resultMessage.style.color =
+            matches.length > 0 ? "#276738" : "#C62828";
+    });
     </script>
 
 </body>
