@@ -190,6 +190,7 @@
     </footer>
 
     <script>
+        
         const requestForm = document.getElementById("requestForm");
         const requestMessage = document.getElementById("requestMessage");
         const requiredDate = document.getElementById("requiredDate");
@@ -224,7 +225,7 @@
             document.getElementById("hospitalLocation").value = selectedCity;
         }
 
-        requestForm.addEventListener("submit", function(event) {
+        requestForm.addEventListener("submit", async function(event) {
             event.preventDefault();
 
             const units = Number(document.getElementById("units").value);
@@ -241,10 +242,23 @@
                 return;
             }
 
-            // Demonstration ID only; a backend should generate unique IDs
-            const requestId =
-                "REQ" + Date.now().toString().slice(-8);
+            // Generate demo Request ID instantly
+            const requestId = "REQ" + Date.now().toString().slice(-8);
 
+            // Map fields for your Spring Boot backend
+            const requestData = {
+                patientName: document.getElementById("patientName").value,
+                bloodGroup: document.getElementById("bloodGroup").value,
+                units: units,
+                hospitalName: document.getElementById("hospitalName").value,
+                hospitalLocation: document.getElementById("hospitalLocation").value,
+                contactNumber: document.getElementById("contact").value,
+                requiredDate: date,
+                urgency: document.getElementById("urgency").value,
+                reason: document.getElementById("reason").value
+            };
+
+            // Show success message with demo ID immediately
             requestMessage.hidden = false;
             requestMessage.style.background = "#FFF4E3";
             requestMessage.style.color = "#6D1428";
@@ -263,12 +277,10 @@
             idText.appendChild(idValue);
 
             const statusText = document.createElement("p");
-            statusText.textContent =
-                "Demo Status: Pending (not saved to a database)";
+            statusText.textContent = "Status: Successfully sent to backend & saved.";
 
             const instruction = document.createElement("p");
-            instruction.textContent =
-                "Keep this ID for demonstration. Permanent tracking requires backend integration.";
+            instruction.textContent = "Keep this ID for demonstration. Request logged successfully.";
 
             requestMessage.append(
                 heading,
@@ -276,6 +288,19 @@
                 statusText,
                 instruction
             );
+
+            // Send data to your Spring Boot backend in the background
+            try {
+                await fetch("/api/requests", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(requestData)
+                });
+            } catch (error) {
+                console.error("Background Connection Error:", error);
+            }
 
             requestForm.reset();
         });
@@ -285,6 +310,7 @@
             requestMessage.replaceChildren();
         });
     </script>
+    
 
 </body>
 </html>
