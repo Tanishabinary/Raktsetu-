@@ -258,7 +258,7 @@
                 statusMessage.textContent = "Searching database...";
                 statusMessage.style.color = "#555";
 
-                const response = await fetch(`/api/requests/status/${numericId}`);
+                const response = await fetch(`https://raktsetu-vryn.onrender.com/api/requests/status/${numericId}`);
                 const result = await response.json();
 
                 if (result.status === "success") {
