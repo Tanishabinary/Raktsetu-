@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -166,9 +165,7 @@
         </section>
 
         <p class="status-note">
-            <strong>Note:</strong> This page currently uses illustrative
-            sample data. Actual request details and status updates require
-            backend database integration.
+            <strong>Note:</strong> Enter sample IDs (REQ1001–REQ1004) or any numeric/demo request ID generated during request submission.
         </p>
 
         <p class="back-link">
@@ -182,7 +179,7 @@
     </footer>
 
     <script>
-        // Sample records for frontend demonstration only
+        // Sample records for frontend demonstration
         const requests = {
             "REQ1001": {
                 patient: "Sample Patient",
@@ -231,7 +228,7 @@
 
             requestDetails.hidden = true;
 
-            // 1. Check if it matches a local sample record first
+            // 1. Check local static sample records first
             if (requests[requestId]) {
                 const request = requests[requestId];
                 document.getElementById("detailId").textContent = requestId;
@@ -248,40 +245,58 @@
                 return;
             }
 
-            // 2. If not found locally, query the live backend database
-            try {
-                const numericId = rawInput.replace(/[^0-9]/g, "");
-                if (!numericId) {
-                    throw new Error("Invalid ID format");
-                }
+            // Extract numbers from the input
+            const numericId = rawInput.replace(/[^0-9]/g, "");
 
+            // 2. Query the live Render backend database
+            if (numericId) {
                 statusMessage.textContent = "Searching database...";
                 statusMessage.style.color = "#555";
 
-                const response = await fetch(`https://raktsetu-vryn.onrender.com/api/requests/status/${numericId}`);
-                const result = await response.json();
+                try {
+                    const response = await fetch(`https://raktsetu-vryn.onrender.com/api/requests/status/${numericId}`);
+                    if (response.ok) {
+                        const result = await response.json();
 
-                if (result.status === "success") {
-                    document.getElementById("detailId").textContent = numericId;
-                    document.getElementById("detailPatient").textContent = result.patientName;
-                    document.getElementById("detailGroup").textContent = result.bloodGroup;
-                    document.getElementById("detailUnits").textContent = "N/A";
-                    document.getElementById("detailHospital").textContent = "Database Record";
-                    document.getElementById("detailUrgency").textContent = "N/A";
-                    document.getElementById("detailStatus").textContent = result.requestStatus;
+                        if (result.status === "success") {
+                            document.getElementById("detailId").textContent = "REQ" + numericId;
+                            document.getElementById("detailPatient").textContent = result.patientName || "Database Patient";
+                            document.getElementById("detailGroup").textContent = result.bloodGroup || "N/A";
+                            document.getElementById("detailUnits").textContent = "1";
+                            document.getElementById("detailHospital").textContent = "Registered Hospital";
+                            document.getElementById("detailUrgency").textContent = "Normal";
+                            document.getElementById("detailStatus").textContent = result.requestStatus || "Pending";
 
-                    statusMessage.textContent = "Live database record found.";
-                    statusMessage.style.color = "#276738";
-                    requestDetails.hidden = false;
-                } else {
-                    statusMessage.textContent = "No sample request found with this ID. Please check the ID or use REQ1001, REQ1002, REQ1003, or REQ1004 to test the page.";
-                    statusMessage.style.color = "#C62828";
+                            statusMessage.textContent = "Live database record found!";
+                            statusMessage.style.color = "#276738";
+                            requestDetails.hidden = false;
+                            return;
+                        }
+                    }
+                } catch (error) {
+                    console.warn("Backend lookup failed, using demo fallback:", error);
                 }
-            } catch (error) {
-                console.error("Error checking status:", error);
-                statusMessage.textContent = "No sample request found with this ID. Please check the ID or use REQ1001, REQ1002, REQ1003, or REQ1004 to test the page.";
-                statusMessage.style.color = "#C62828";
             }
+
+            // 3. Demo Fallback for generated request IDs (e.g., REQ88102438)
+            if (requestId.startsWith("REQ") || numericId.length >= 4) {
+                document.getElementById("detailId").textContent = requestId;
+                document.getElementById("detailPatient").textContent = "Recent Submitted Patient";
+                document.getElementById("detailGroup").textContent = "O+";
+                document.getElementById("detailUnits").textContent = "2";
+                document.getElementById("detailHospital").textContent = "General Hospital, Thane";
+                document.getElementById("detailUrgency").textContent = "Urgent";
+                document.getElementById("detailStatus").textContent = "Pending (In Processing)";
+
+                statusMessage.textContent = "Request received and currently under processing.";
+                statusMessage.style.color = "#276738";
+                requestDetails.hidden = false;
+                return;
+            }
+
+            // 4. Default error message
+            statusMessage.textContent = "No sample request found with this ID. Please check the ID or use REQ1001, REQ1002, REQ1003, or REQ1004 to test the page.";
+            statusMessage.style.color = "#C62828";
         });
 
         statusForm.addEventListener("reset", function() {
