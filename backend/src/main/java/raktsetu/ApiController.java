@@ -38,7 +38,7 @@ public class ApiController {
 
             response.put("status", "success");
             response.put("message", "Donor registered successfully!");
-            response.put("donorId", d.donorId);
+            response.put("donorId", d.getDonorId());
         } catch (Exception e) {
             response.put("status", "error");
             response.put("message", "Error registering donor: " + e.getMessage());

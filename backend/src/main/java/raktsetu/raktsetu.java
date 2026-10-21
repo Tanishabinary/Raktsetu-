@@ -30,12 +30,11 @@ public class raktsetu {
     loadRequests();
     SpringApplication.run(raktsetu.class, args);
 
-    for (Donor donor : donors) {
-        if (donor.donorId >= nextId) {
-            nextId = donor.donorId + 1;
-        }
+   for (Donor donor : donors) {
+    if (donor.getDonorId() >= nextId) {
+        nextId = donor.getDonorId() + 1;
     }
-
+}
     // ONLY run the interactive terminal menu if a real console is available (Local PC)
     if (System.console() != null) {
         int choice = 0;
@@ -198,7 +197,7 @@ nextId++;
         boolean found = false;
 
         for (Donor d : donors) {
-            if (d.bloodGroup.equals(group)) {
+            if (d.getBloodGroup().equals(group)) {
                 d.displayDonor();
                 found = true;
             }

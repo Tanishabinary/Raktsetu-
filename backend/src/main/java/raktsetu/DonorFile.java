@@ -17,12 +17,12 @@ public class DonorFile {
             for (Donor donor : donors) {
 
                 writer.write(
-                    donor.donorId + ","
-                    + donor.name + ","
-                    + donor.age + ","
-                    + donor.bloodGroup + ","
-                    + donor.phone + ","
-                    + donor.city + "\n"
+                    donor.getDonorId() + "," +
+                    donor.getName() + "," +
+                    donor.getAge() + "," +
+                    donor.getBloodGroup() + "," +
+                    donor.getPhone() + "," +
+                    donor.getCity() + "\n"
                 );
             }
 
